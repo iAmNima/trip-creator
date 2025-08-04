@@ -1,0 +1,9 @@
+/* src/index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Optional: Font setup (customize if needed) */
+:root {
+  font-family: system-ui, sans-serif;
+}
