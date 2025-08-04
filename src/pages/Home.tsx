@@ -46,6 +46,28 @@ const Home: React.FC = () => {
     <div className="flex flex-col items-center justify-center py-20 px-4">
       <h1 className="text-4xl font-bold mb-8 text-center">Plan Your Perfect Trip</h1>
 
+      {/* Display chosen details so they persist across steps */}
+      <div className="flex flex-wrap gap-3 mb-8 justify-center">
+        {destination && (
+          <span className="px-4 py-2 bg-indigo-100 text-indigo-800 rounded-full shadow-sm">
+            {destination}
+          </span>
+        )}
+        {duration && (
+          <span className="px-4 py-2 bg-indigo-100 text-indigo-800 rounded-full shadow-sm">
+            {duration}
+          </span>
+        )}
+        {interests.map((interest) => (
+          <span
+            key={interest}
+            className="px-4 py-2 bg-indigo-100 text-indigo-800 rounded-full shadow-sm"
+          >
+            {interest}
+          </span>
+        ))}
+      </div>
+
       {step === 1 && (
         <AnimatedInput
           label="Where do you want to go?"
