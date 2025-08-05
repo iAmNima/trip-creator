@@ -8,15 +8,14 @@ interface PathwayConnectorProps {
 
 const PathwayConnector: React.FC<PathwayConnectorProps> = ({ direction }) => {
   const pathD =
-    direction === "right"
-      ? "M40 0 V40 Q40 60 60 60 H80"
-      : "M40 0 V40 Q40 60 20 60 H0";
-  const circleCx = direction === "right" ? 80 : 0;
+    direction === "right" ? "M44 0 L84 40" : "M44 0 L4 40";
+  const circleCx = direction === "right" ? 84 : 4;
 
   return (
     <motion.svg
-      width="80"
-      height="60"
+      width="88"
+      height="44"
+      viewBox="0 0 88 44"
       className="text-indigo-400"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -32,7 +31,7 @@ const PathwayConnector: React.FC<PathwayConnectorProps> = ({ direction }) => {
       />
       <motion.circle
         cx={circleCx}
-        cy={60}
+        cy={40}
         r={4}
         fill="#6366f1"
         initial={{ scale: 0 }}

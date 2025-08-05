@@ -6,11 +6,15 @@ export async function fetchImageFromGoogle(query: string): Promise<string | null
   const res = await fetch(
     `https://www.googleapis.com/customsearch/v1?q=${encodeURIComponent(
       query
-    )}&cx=${cx}&searchType=image&num=1&key=${apiKey}`
+    )}&cx=${cx}&searchType=image&num=10&key=${apiKey}`
   );
 
   const data = await res.json();
 
-  const image = data.items?.[0]?.link;
+  const image = data.items?.find((item: { link?: string }) => {
+    const link = (item.link || "").toLowerCase();
+    return !link.includes("instagram");
+  })?.link;
+
   return image || null;
 }
