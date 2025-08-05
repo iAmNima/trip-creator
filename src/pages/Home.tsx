@@ -90,7 +90,8 @@ const Home: React.FC = () => {
         </button>
       )}
 
-      <h1 className="text-4xl font-bold mb-8 text-center">Plan Your Perfect Trip</h1>
+      <h1 className="text-5xl font-extrabold text-center mb-2">Trip Creator</h1>
+      <p className="text-4xl font-bold mb-8 text-center">Plan Your Perfect Trip</p>
 
       {/* Display chosen details */}
       <div className="flex flex-wrap gap-3 mb-8 justify-center">
