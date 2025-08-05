@@ -5,6 +5,7 @@ import TagSelector from "../components/TagSelector";
 import TripStepCard from "../components/TripStepCard";
 import PathwayConnector from "../components/PathwayConnector";
 import { generateTripPlan } from "../api/openai";
+import { fetchImageFromGoogle } from "../api/googleImage";
 
 // Type for individual itinerary step
 interface TripStep {
@@ -33,8 +34,33 @@ const Home: React.FC = () => {
     try {
       const raw = await generateTripPlan(destination, duration, interests);
       const parsed: TripStep[] = JSON.parse(raw);
-      setTripSteps(parsed);
-      setStep(5); // move to final view
+
+      // Track which image we already fetched per location
+      const locationImageCache = new Map<string, string>();
+
+      const stepsWithImages = await Promise.all(
+        parsed.map(async (step) => {
+          const key = step.location.trim().toLowerCase(); // normalize
+
+          if (!locationImageCache.has(key)) {
+            const imagePrompt = step.imagePrompt || `${step.title} ${step.location}`;
+            const imageUrl = await fetchImageFromGoogle(imagePrompt);
+            if (imageUrl) {
+              locationImageCache.set(key, imageUrl);
+            }
+          }
+
+          const imageUrl = locationImageCache.get(key);
+
+          return {
+            ...step,
+            imageUrl: imageUrl ?? undefined,
+          };
+        })
+      );
+
+      setTripSteps(stepsWithImages);
+      setStep(5);
     } catch (err) {
       console.error("Trip generation failed:", err);
     } finally {
@@ -46,7 +72,7 @@ const Home: React.FC = () => {
     <div className="flex flex-col items-center justify-center py-20 px-4">
       <h1 className="text-4xl font-bold mb-8 text-center">Plan Your Perfect Trip</h1>
 
-      {/* Display chosen details so they persist across steps */}
+      {/* Display chosen details */}
       <div className="flex flex-wrap gap-3 mb-8 justify-center">
         {destination && (
           <span className="px-4 py-2 bg-indigo-100 text-indigo-800 rounded-full shadow-sm">
@@ -117,7 +143,7 @@ const Home: React.FC = () => {
                 title={step.title}
                 location={step.location}
                 imageUrl={
-                  step.imageUrl || "https://via.placeholder.com/800x400?text=Trip+Step"
+                  step.imageUrl || "https://source.unsplash.com/800x400/?travel"
                 }
                 mapsLink={step.mapsLink}
                 websiteLink={step.websiteLink}
