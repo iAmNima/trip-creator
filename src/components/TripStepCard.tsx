@@ -22,12 +22,12 @@ const TripStepCard: React.FC<TripStepCardProps> = ({
 }) => {
   return (
     <motion.div
-      className="bg-white rounded-2xl shadow-lg overflow-hidden w-full max-w-2xl mx-auto"
+      className="bg-white rounded-2xl shadow-lg overflow-hidden w-72 sm:w-80"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <img src={imageUrl} alt={title} className="w-full h-56 object-cover" />
+      <img src={imageUrl} alt={title} className="w-full h-40 object-cover" />
 
       <div className="p-5">
         <p className="text-sm text-gray-500">{time}</p>

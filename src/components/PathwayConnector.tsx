@@ -2,30 +2,44 @@
 import React from "react";
 import { motion } from "framer-motion";
 
-const PathwayConnector: React.FC = () => {
+interface PathwayConnectorProps {
+  direction: "left" | "right";
+}
+
+const PathwayConnector: React.FC<PathwayConnectorProps> = ({ direction }) => {
+  const pathD =
+    direction === "right"
+      ? "M40 0 V40 Q40 60 60 60 H80"
+      : "M40 0 V40 Q40 60 20 60 H0";
+  const circleCx = direction === "right" ? 80 : 0;
+
   return (
-    <motion.div
-      className="flex flex-col items-center my-6"
+    <motion.svg
+      width="80"
+      height="60"
+      className="text-indigo-400"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
     >
-      {/* Line */}
-      <motion.div
-        className="w-1 bg-indigo-300"
-        style={{ height: "40px" }}
-        initial={{ scaleY: 0 }}
-        animate={{ scaleY: 1 }}
-        transition={{ duration: 0.4 }}
+      <motion.path
+        d={pathD}
+        fill="none"
+        stroke="#a5b4fc"
+        strokeWidth={2}
+        initial={{ pathLength: 0 }}
+        animate={{ pathLength: 1 }}
+        transition={{ duration: 0.6 }}
       />
-
-      {/* Dot */}
-      <motion.div
-        className="w-4 h-4 rounded-full bg-indigo-500 mt-1 shadow"
+      <motion.circle
+        cx={circleCx}
+        cy={60}
+        r={4}
+        fill="#6366f1"
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
-        transition={{ duration: 0.3, delay: 0.2 }}
+        transition={{ duration: 0.3, delay: 0.4 }}
       />
-    </motion.div>
+    </motion.svg>
   );
 };
 
