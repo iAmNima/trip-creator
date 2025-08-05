@@ -4,6 +4,8 @@ import AnimatedInput from "../components/AnimatedInput";
 import TagSelector from "../components/TagSelector";
 import TripStepCard from "../components/TripStepCard";
 import PathwayConnector from "../components/PathwayConnector";
+import TripStepCardSkeleton from "../components/TripStepCardSkeleton";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import { generateTripPlan } from "../api/openai";
 import { fetchImageFromGoogle } from "../api/googleImage";
 
@@ -28,6 +30,14 @@ const Home: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
   const handleNext = () => setStep((prev) => prev + 1);
+  const handleBack = () => setStep((prev) => Math.max(1, prev - 1));
+  const handleReset = () => {
+    setDestination("");
+    setDuration("");
+    setInterests([]);
+    setTripSteps([]);
+    setStep(1);
+  };
 
   const handleCreateTrip = async () => {
     setLoading(true);
@@ -69,7 +79,17 @@ const Home: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center py-20 px-4">
+    <div className="flex flex-col items-center justify-center py-20 px-4 relative">
+      {step > 1 && step <= 4 && (
+        <button
+          onClick={handleBack}
+          className="absolute top-4 left-4 text-gray-600 hover:text-gray-800"
+          aria-label="Go back"
+        >
+          <ArrowLeft className="w-6 h-6" />
+        </button>
+      )}
+
       <h1 className="text-4xl font-bold mb-8 text-center">Plan Your Perfect Trip</h1>
 
       {/* Display chosen details */}
@@ -126,31 +146,61 @@ const Home: React.FC = () => {
       )}
 
       {step === 4 && (
-        <button
-          onClick={handleCreateTrip}
-          className="mt-8 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-xl shadow-md hover:bg-indigo-700 transition"
-        >
-          {loading ? "Creating your trip..." : "Create My Trip ✈️"}
-        </button>
+        <div className="flex flex-col items-center w-full">
+          <button
+            onClick={handleCreateTrip}
+            disabled={loading}
+            className="mt-8 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-xl shadow-md hover:bg-indigo-700 transition flex items-center gap-2 disabled:opacity-70"
+          >
+            {loading && <Loader2 className="w-5 h-5 animate-spin" />}
+            {loading ? "Creating your trip..." : "Create My Trip ✈️"}
+          </button>
+          {loading && (
+            <div className="w-full max-w-3xl flex flex-col items-center mt-10 gap-10">
+              {[0, 1, 2].map((i) => (
+                <React.Fragment key={i}>
+                  <div
+                    className={`w-full flex ${i % 2 === 0 ? "justify-start" : "justify-end"}`}
+                  >
+                    <TripStepCardSkeleton />
+                  </div>
+                  {i < 2 && (
+                    <PathwayConnector direction={i % 2 === 0 ? "right" : "left"} />
+                  )}
+                </React.Fragment>
+              ))}
+            </div>
+          )}
+        </div>
       )}
 
       {step === 5 && (
         <div className="w-full max-w-3xl flex flex-col items-center mt-10 gap-10">
-          {tripSteps.map((step, i) => (
-            <div key={i} className="w-full">
-              <TripStepCard
-                time={step.time}
-                title={step.title}
-                location={step.location}
-                imageUrl={
-                  step.imageUrl || "https://source.unsplash.com/800x400/?travel"
-                }
-                mapsLink={step.mapsLink}
-                websiteLink={step.websiteLink}
-              />
-              {i < tripSteps.length - 1 && <PathwayConnector />}
-            </div>
+          {tripSteps.map((s, i) => (
+            <React.Fragment key={i}>
+              <div
+                className={`w-full flex ${i % 2 === 0 ? "justify-start" : "justify-end"}`}
+              >
+                <TripStepCard
+                  time={s.time}
+                  title={s.title}
+                  location={s.location}
+                  imageUrl={s.imageUrl || "https://source.unsplash.com/800x400/?travel"}
+                  mapsLink={s.mapsLink}
+                  websiteLink={s.websiteLink}
+                />
+              </div>
+              {i < tripSteps.length - 1 && (
+                <PathwayConnector direction={i % 2 === 0 ? "right" : "left"} />
+              )}
+            </React.Fragment>
           ))}
+          <button
+            onClick={handleReset}
+            className="mt-4 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-xl shadow-md hover:bg-indigo-700 transition"
+          >
+            Start New Trip
+          </button>
         </div>
       )}
     </div>
