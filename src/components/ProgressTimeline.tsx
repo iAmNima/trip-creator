@@ -12,7 +12,7 @@ interface ProgressTimelineProps {
 
 const ProgressTimeline: React.FC<ProgressTimelineProps> = ({ steps }) => {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [scrollProgress, setScrollProgress] = useState(0); // 0 - 1
+  const [scrollProgress, setScrollProgress] = useState(0); // 0..1
   const visible = useRef(new Set<number>());
 
   // Observe step elements to track which one is active
@@ -46,6 +46,7 @@ const ProgressTimeline: React.FC<ProgressTimelineProps> = ({ steps }) => {
     const updateProgress = () => {
       const elements = document.querySelectorAll("[data-step-index]");
       if (!elements.length) return;
+
       const first = elements[0] as HTMLElement;
       const last = elements[elements.length - 1] as HTMLElement;
 
@@ -57,7 +58,7 @@ const ProgressTimeline: React.FC<ProgressTimelineProps> = ({ steps }) => {
     };
 
     updateProgress();
-    window.addEventListener("scroll", updateProgress);
+    window.addEventListener("scroll", updateProgress, { passive: true });
     window.addEventListener("resize", updateProgress);
     return () => {
       window.removeEventListener("scroll", updateProgress);
@@ -91,6 +92,7 @@ const ProgressTimeline: React.FC<ProgressTimelineProps> = ({ steps }) => {
           const size = isDayStart ? "w-4 h-4" : "w-3 h-3";
           const top = (i / (steps.length - 1)) * 100;
           const label = isDayStart ? `Day ${s.day}` : `${s.title} - ${s.location}`;
+
           return (
             <div
               key={i}
@@ -106,6 +108,7 @@ const ProgressTimeline: React.FC<ProgressTimelineProps> = ({ steps }) => {
             />
           );
         })}
+
         {activeStep && (
           <div
             className="absolute left-full ml-4 -translate-y-1/2 bg-white shadow px-2 py-1 rounded text-xs text-gray-800 whitespace-nowrap"
