@@ -80,7 +80,7 @@ const Home: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center py-20 px-4 relative">
+    <div className="w-3/4 mx-auto py-20 px-4 relative flex flex-col items-center justify-center">
       {step > 1 && step <= 4 && (
         <button
           onClick={handleBack}
