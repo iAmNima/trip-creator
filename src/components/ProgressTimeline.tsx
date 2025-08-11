@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 interface StepItem {
   day: number;
@@ -12,16 +12,25 @@ interface ProgressTimelineProps {
 
 const ProgressTimeline: React.FC<ProgressTimelineProps> = ({ steps }) => {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [scrollProgress, setScrollProgress] = useState(0); // 0..1
+  const visible = useRef(new Set<number>());
 
+  // Observe step elements to track which one is active
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
+          const idx = Number((entry.target as HTMLElement).dataset.stepIndex);
           if (entry.isIntersecting) {
-            const idx = Number((entry.target as HTMLElement).dataset.stepIndex);
-            setActiveIndex((prev) => Math.max(prev, idx));
+            visible.current.add(idx);
+          } else {
+            visible.current.delete(idx);
           }
         });
+        const maxIdx = visible.current.size
+          ? Math.max(...Array.from(visible.current))
+          : 0;
+        setActiveIndex(maxIdx);
       },
       { threshold: 0.6 }
     );
@@ -32,7 +41,30 @@ const ProgressTimeline: React.FC<ProgressTimelineProps> = ({ steps }) => {
     return () => observer.disconnect();
   }, [steps]);
 
-  const progress = ((activeIndex + 1) / steps.length) * 100;
+  // Smooth progress based on overall scroll position
+  useEffect(() => {
+    const updateProgress = () => {
+      const elements = document.querySelectorAll("[data-step-index]");
+      if (!elements.length) return;
+
+      const first = elements[0] as HTMLElement;
+      const last = elements[elements.length - 1] as HTMLElement;
+
+      const start = first.getBoundingClientRect().top + window.scrollY;
+      const end = last.getBoundingClientRect().bottom + window.scrollY;
+      const current = window.scrollY + window.innerHeight / 2;
+      const ratio = (current - start) / (end - start);
+      setScrollProgress(Math.max(0, Math.min(1, ratio)));
+    };
+
+    updateProgress();
+    window.addEventListener("scroll", updateProgress, { passive: true });
+    window.addEventListener("resize", updateProgress);
+    return () => {
+      window.removeEventListener("scroll", updateProgress);
+      window.removeEventListener("resize", updateProgress);
+    };
+  }, [steps]);
 
   const firstIndexByDay = new Map<number, number>();
   steps.forEach((s, i) => {
@@ -41,18 +73,26 @@ const ProgressTimeline: React.FC<ProgressTimelineProps> = ({ steps }) => {
     }
   });
 
+  const activeStep = steps[activeIndex];
+  const activeLabel = activeStep
+    ? firstIndexByDay.get(activeStep.day) === activeIndex
+      ? `Day ${activeStep.day}`
+      : `${activeStep.title} - ${activeStep.location}`
+    : "";
+
   return (
-    <div className="fixed left-4 top-24 bottom-24 w-6 z-10">
-      <div className="relative h-full w-1 bg-gray-200 rounded-full">
+    <div className="fixed left-8 top-24 bottom-24 w-8 z-10">
+      <div className="relative h-full w-2 bg-gray-200 rounded-full">
         <div
-          className="absolute left-0 top-0 w-full bg-indigo-500 rounded-full"
-          style={{ height: `${progress}%` }}
+          className="absolute left-0 top-0 w-full bg-indigo-500 rounded-full transition-all duration-300 ease-out"
+          style={{ height: `${scrollProgress * 100}%` }}
         />
         {steps.map((s, i) => {
           const isDayStart = firstIndexByDay.get(s.day) === i;
-          const size = isDayStart ? "w-3 h-3" : "w-2 h-2";
+          const size = isDayStart ? "w-4 h-4" : "w-3 h-3";
           const top = (i / (steps.length - 1)) * 100;
           const label = isDayStart ? `Day ${s.day}` : `${s.title} - ${s.location}`;
+
           return (
             <div
               key={i}
@@ -68,10 +108,18 @@ const ProgressTimeline: React.FC<ProgressTimelineProps> = ({ steps }) => {
             />
           );
         })}
+
+        {activeStep && (
+          <div
+            className="absolute left-full ml-4 -translate-y-1/2 bg-white shadow px-2 py-1 rounded text-xs text-gray-800 whitespace-nowrap"
+            style={{ top: `${scrollProgress * 100}%` }}
+          >
+            {activeLabel}
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
 export default ProgressTimeline;
-
