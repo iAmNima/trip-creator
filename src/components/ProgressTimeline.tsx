@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 interface StepItem {
   day: number;
@@ -12,58 +12,32 @@ interface ProgressTimelineProps {
 
 const ProgressTimeline: React.FC<ProgressTimelineProps> = ({ steps }) => {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [scrollProgress, setScrollProgress] = useState(0); // 0..1
-  const visible = useRef(new Set<number>());
 
-  // Observe step elements to track which one is active
+  // Track which step is currently in view based on scroll position
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          const idx = Number((entry.target as HTMLElement).dataset.stepIndex);
-          if (entry.isIntersecting) {
-            visible.current.add(idx);
-          } else {
-            visible.current.delete(idx);
-          }
-        });
-        const maxIdx = visible.current.size
-          ? Math.max(...Array.from(visible.current))
-          : 0;
-        setActiveIndex(maxIdx);
-      },
-      { threshold: 0.6 }
-    );
+    const elements = Array.from(
+      document.querySelectorAll("[data-step-index]")
+    ) as HTMLElement[];
 
-    const elements = document.querySelectorAll("[data-step-index]");
-    elements.forEach((el) => observer.observe(el));
-
-    return () => observer.disconnect();
-  }, [steps]);
-
-  // Smooth progress based on overall scroll position
-  useEffect(() => {
-    const updateProgress = () => {
-      const elements = document.querySelectorAll("[data-step-index]");
-      if (!elements.length) return;
-
-      const first = elements[0] as HTMLElement;
-      const last = elements[elements.length - 1] as HTMLElement;
-
-      const start = first.getBoundingClientRect().top + window.scrollY;
-      const end =
-        last.getBoundingClientRect().bottom + window.scrollY - window.innerHeight;
-      const current = window.scrollY;
-      const ratio = (current - start) / (end - start);
-      setScrollProgress(Math.max(0, Math.min(1, ratio)));
+    const updateActive = () => {
+      let idx = 0;
+      const middle = window.innerHeight / 2;
+      for (let i = 0; i < elements.length; i++) {
+        if (elements[i].getBoundingClientRect().top - middle <= 0) {
+          idx = i;
+        } else {
+          break;
+        }
+      }
+      setActiveIndex(idx);
     };
 
-    updateProgress();
-    window.addEventListener("scroll", updateProgress, { passive: true });
-    window.addEventListener("resize", updateProgress);
+    updateActive();
+    window.addEventListener("scroll", updateActive, { passive: true });
+    window.addEventListener("resize", updateActive);
     return () => {
-      window.removeEventListener("scroll", updateProgress);
-      window.removeEventListener("resize", updateProgress);
+      window.removeEventListener("scroll", updateActive);
+      window.removeEventListener("resize", updateActive);
     };
   }, [steps]);
 
@@ -80,13 +54,14 @@ const ProgressTimeline: React.FC<ProgressTimelineProps> = ({ steps }) => {
       ? `Day ${activeStep.day}`
       : `${activeStep.title} - ${activeStep.location}`
     : "";
+  const progress = steps.length > 1 ? activeIndex / (steps.length - 1) : 0;
 
   return (
     <div className="fixed left-8 top-24 bottom-24 w-8 z-10">
       <div className="relative h-full w-2 bg-indigo-100 rounded-full">
         <div
           className="absolute left-0 top-0 w-full bg-indigo-600 rounded-full transition-all duration-300 ease-out"
-          style={{ height: `${scrollProgress * 100}%` }}
+          style={{ height: `${progress * 100}%` }}
         />
         {steps.map((s, i) => {
           const isDayStart = firstIndexByDay.get(s.day) === i;
@@ -103,8 +78,9 @@ const ProgressTimeline: React.FC<ProgressTimelineProps> = ({ steps }) => {
                   `[data-step-index='${i}']`
                 );
                 el?.scrollIntoView({ behavior: "smooth", block: "start" });
+                setActiveIndex(i);
               }}
-              className={`absolute left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white border-2 border-indigo-600 rounded-full shadow cursor-pointer ${size}`}
+              className={`absolute left-1/2 -translate-x-1/2 -translate-y-1/2 border-2 border-indigo-600 rounded-full shadow cursor-pointer ${size} ${i <= activeIndex ? "bg-indigo-600" : "bg-white"}`}
               style={{ top: `${top}%` }}
             />
           );
@@ -113,7 +89,7 @@ const ProgressTimeline: React.FC<ProgressTimelineProps> = ({ steps }) => {
         {activeStep && (
           <div
             className="absolute left-full ml-4 -translate-y-1/2 bg-indigo-600 text-white shadow-lg px-3 py-1 rounded-full text-xs whitespace-nowrap"
-            style={{ top: `${scrollProgress * 100}%` }}
+            style={{ top: `${progress * 100}%` }}
           >
             {activeLabel}
           </div>
