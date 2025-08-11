@@ -27,6 +27,7 @@ const Home: React.FC = () => {
   const [duration, setDuration] = useState("");
   const [interests, setInterests] = useState<string[]>([]);
   const [tripSteps, setTripSteps] = useState<TripStep[]>([]);
+  const [cardPositions, setCardPositions] = useState<("left" | "right")[]>([]);
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
 
@@ -37,6 +38,7 @@ const Home: React.FC = () => {
     setDuration("");
     setInterests([]);
     setTripSteps([]);
+    setCardPositions([]);
     setStep(1);
   };
 
@@ -71,6 +73,9 @@ const Home: React.FC = () => {
       );
 
       setTripSteps(stepsWithImages);
+      setCardPositions(
+        stepsWithImages.map(() => (Math.random() < 0.5 ? "left" : "right"))
+      );
       setStep(5);
     } catch (err) {
       console.error("Trip generation failed:", err);
@@ -167,7 +172,10 @@ const Home: React.FC = () => {
                     <TripStepCardSkeleton />
                   </div>
                   {i < 2 && (
-                    <PathwayConnector direction={i % 2 === 0 ? "right" : "left"} />
+                    <PathwayConnector
+                      from={i % 2 === 0 ? "left" : "right"}
+                      to={i % 2 === 0 ? "right" : "left"}
+                    />
                   )}
                 </React.Fragment>
               ))}
@@ -193,7 +201,9 @@ const Home: React.FC = () => {
               <React.Fragment key={i}>
                 <div
                   data-step-index={i}
-                  className={`w-full flex ${i % 2 === 0 ? "justify-start" : "justify-end"}`}
+                  className={`w-full flex ${
+                    cardPositions[i] === "left" ? "justify-start" : "justify-end"
+                  }`}
                 >
                   <TripStepCard
                     time={s.time}
@@ -205,7 +215,10 @@ const Home: React.FC = () => {
                   />
                 </div>
                 {i < tripSteps.length - 1 && (
-                  <PathwayConnector direction={i % 2 === 0 ? "right" : "left"} />
+                  <PathwayConnector
+                    from={cardPositions[i]}
+                    to={cardPositions[i + 1]}
+                  />
                 )}
               </React.Fragment>
             ))}

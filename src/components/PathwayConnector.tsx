@@ -3,13 +3,23 @@ import React from "react";
 import { motion } from "framer-motion";
 
 interface PathwayConnectorProps {
-  direction: "left" | "right";
+  from: "left" | "right";
+  to: "left" | "right";
 }
 
-const PathwayConnector: React.FC<PathwayConnectorProps> = ({ direction }) => {
-  const pathD =
-    direction === "right" ? "M44 0 L84 40" : "M44 0 L4 40";
-  const circleCx = direction === "right" ? 84 : 4;
+const PathwayConnector: React.FC<PathwayConnectorProps> = ({ from, to }) => {
+  let pathD = "";
+  if (from === "left" && to === "right") {
+    pathD = "M44 0 L84 40";
+  } else if (from === "right" && to === "left") {
+    pathD = "M44 0 L4 40";
+  } else if (from === "left" && to === "left") {
+    pathD = "M44 0 L44 20 L4 40";
+  } else {
+    pathD = "M44 0 L44 20 L84 40";
+  }
+
+  const circleCx = to === "right" ? 84 : 4;
 
   return (
     <motion.svg
