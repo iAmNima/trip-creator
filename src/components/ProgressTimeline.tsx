@@ -29,6 +29,9 @@ const ProgressTimeline: React.FC<ProgressTimelineProps> = ({ steps }) => {
           break;
         }
       }
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 1) {
+        idx = elements.length - 1;
+      }
       setActiveIndex(idx);
     };
 
