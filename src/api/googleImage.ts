@@ -13,7 +13,7 @@ export async function fetchImageFromGoogle(query: string): Promise<string | null
 
   const image = data.items?.find((item: { link?: string }) => {
     const link = (item.link || "").toLowerCase();
-    return !link.includes("instagram");
+    return !link.includes("instagram") && !link.includes("facebook");
   })?.link;
 
   return image || null;
