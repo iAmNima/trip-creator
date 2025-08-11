@@ -51,8 +51,9 @@ const ProgressTimeline: React.FC<ProgressTimelineProps> = ({ steps }) => {
       const last = elements[elements.length - 1] as HTMLElement;
 
       const start = first.getBoundingClientRect().top + window.scrollY;
-      const end = last.getBoundingClientRect().bottom + window.scrollY;
-      const current = window.scrollY + window.innerHeight / 2;
+      const end =
+        last.getBoundingClientRect().bottom + window.scrollY - window.innerHeight;
+      const current = window.scrollY;
       const ratio = (current - start) / (end - start);
       setScrollProgress(Math.max(0, Math.min(1, ratio)));
     };
@@ -82,9 +83,9 @@ const ProgressTimeline: React.FC<ProgressTimelineProps> = ({ steps }) => {
 
   return (
     <div className="fixed left-8 top-24 bottom-24 w-8 z-10">
-      <div className="relative h-full w-2 bg-gray-200 rounded-full">
+      <div className="relative h-full w-2 bg-indigo-100 rounded-full">
         <div
-          className="absolute left-0 top-0 w-full bg-indigo-500 rounded-full transition-all duration-300 ease-out"
+          className="absolute left-0 top-0 w-full bg-indigo-600 rounded-full transition-all duration-300 ease-out"
           style={{ height: `${scrollProgress * 100}%` }}
         />
         {steps.map((s, i) => {
@@ -103,7 +104,7 @@ const ProgressTimeline: React.FC<ProgressTimelineProps> = ({ steps }) => {
                 );
                 el?.scrollIntoView({ behavior: "smooth", block: "start" });
               }}
-              className={`absolute left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white border-2 border-indigo-500 rounded-full cursor-pointer ${size}`}
+              className={`absolute left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white border-2 border-indigo-600 rounded-full shadow cursor-pointer ${size}`}
               style={{ top: `${top}%` }}
             />
           );
@@ -111,7 +112,7 @@ const ProgressTimeline: React.FC<ProgressTimelineProps> = ({ steps }) => {
 
         {activeStep && (
           <div
-            className="absolute left-full ml-4 -translate-y-1/2 bg-white shadow px-2 py-1 rounded text-xs text-gray-800 whitespace-nowrap"
+            className="absolute left-full ml-4 -translate-y-1/2 bg-indigo-600 text-white shadow-lg px-3 py-1 rounded-full text-xs whitespace-nowrap"
             style={{ top: `${scrollProgress * 100}%` }}
           >
             {activeLabel}

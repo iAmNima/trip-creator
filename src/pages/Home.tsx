@@ -176,39 +176,39 @@ const Home: React.FC = () => {
         </div>
       )}
 
-      {step === 5 && (
-        <>
-          <ProgressTimeline steps={tripSteps} />
-          <div className="w-full max-w-3xl flex flex-col items-center mt-10 gap-10">
-            {tripSteps.map((s, i) => (
-              <React.Fragment key={i}>
-                <div
-                  data-step-index={i}
-                  className={`w-full flex ${i % 2 === 0 ? "justify-start" : "justify-end"}`}
-                >
-                  <TripStepCard
-                    time={s.time}
-                    title={s.title}
-                    location={s.location}
-                    imageUrl={s.imageUrl || "https://source.unsplash.com/800x400/?travel"}
-                    mapsLink={s.mapsLink}
-                    websiteLink={s.websiteLink}
-                  />
-                </div>
-                {i < tripSteps.length - 1 && (
-                  <PathwayConnector direction={i % 2 === 0 ? "right" : "left"} />
-                )}
-              </React.Fragment>
-            ))}
+        {step === 5 && (
+          <>
             <button
               onClick={handleReset}
-              className="mt-4 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-xl shadow-md hover:bg-indigo-700 transition"
+              className="absolute top-4 right-4 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-xl shadow-md hover:bg-indigo-700 transition"
             >
               Start New Trip
             </button>
-          </div>
-        </>
-      )}
+            <ProgressTimeline steps={tripSteps} />
+            <div className="w-full max-w-3xl flex flex-col items-center mt-10 gap-10">
+              {tripSteps.map((s, i) => (
+                <React.Fragment key={i}>
+                  <div
+                    data-step-index={i}
+                    className={`w-full flex ${i % 2 === 0 ? "justify-start" : "justify-end"}`}
+                  >
+                    <TripStepCard
+                      time={s.time}
+                      title={s.title}
+                      location={s.location}
+                      imageUrl={s.imageUrl || "https://source.unsplash.com/800x400/?travel"}
+                      mapsLink={s.mapsLink}
+                      websiteLink={s.websiteLink}
+                    />
+                  </div>
+                  {i < tripSteps.length - 1 && (
+                    <PathwayConnector direction={i % 2 === 0 ? "right" : "left"} />
+                  )}
+                </React.Fragment>
+              ))}
+            </div>
+          </>
+        )}
     </div>
   );
 };
