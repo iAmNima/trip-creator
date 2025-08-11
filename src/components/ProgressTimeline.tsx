@@ -120,4 +120,3 @@ const ProgressTimeline: React.FC<ProgressTimelineProps> = ({ steps }) => {
 };
 
 export default ProgressTimeline;
-
