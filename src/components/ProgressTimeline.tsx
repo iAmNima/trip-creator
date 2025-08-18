@@ -86,7 +86,7 @@ const ProgressTimeline: React.FC<ProgressTimelineProps> = ({ steps }) => {
   };
 
   return (
-    <div className="fixed left-8 top-24 bottom-24 w-8 z-10">
+    <div className="hidden md:block fixed left-8 top-24 bottom-24 w-8 z-10">
       <div className="relative h-full w-2 bg-indigo-100 rounded-full">
         <div
           className="absolute left-0 top-0 w-full bg-indigo-600 rounded-full transition-all duration-300 ease-out"
