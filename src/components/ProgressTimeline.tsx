@@ -86,45 +86,58 @@ const ProgressTimeline: React.FC<ProgressTimelineProps> = ({ steps }) => {
   };
 
   return (
-    <div className="hidden md:block fixed left-8 top-24 bottom-24 w-8 z-10">
-      <div className="relative h-full w-2 bg-indigo-100 rounded-full">
-        <div
-          className="absolute left-0 top-0 w-full bg-indigo-600 rounded-full transition-all duration-300 ease-out"
-          style={{ height: `${progress}%` }}
-        />
-        {steps.map((s, i) => {
-          const isDayStart = firstIndexByDay.get(s.day) === i;
-          const size = isDayStart ? "w-4 h-4" : "w-3 h-3";
-          const top = (i / (steps.length - 1)) * 100;
-
-          // Tooltips without location
-          const label = isDayStart
-            ? `Day ${s.day} - ${s.title}`
-            : `${s.title}`;
-
-          return (
-            <div
-              key={i}
-              title={label}
-              onClick={() => scrollToStep(i)}
-              className={`absolute left-1/2 -translate-x-1/2 -translate-y-1/2 border-2 border-indigo-600 rounded-full shadow cursor-pointer ${size} ${
-                i <= activeIndex ? "bg-indigo-600" : "bg-white"
-              }`}
-              style={{ top: `${top}%` }}
-            />
-          );
-        })}
-
-        {activeStep && (
+    <>
+      {/* Mobile progress bar */}
+      <div className="md:hidden fixed left-4 top-24 bottom-24 w-2 z-10">
+        <div className="relative h-full w-full bg-indigo-100 rounded-full">
           <div
-            className="absolute left-full ml-4 -translate-y-1/2 bg-indigo-600 text-white shadow-lg px-3 py-1 rounded-full text-xs whitespace-nowrap"
-            style={{ top: `${progress}%` }}
-          >
-            {activeLabel}
-          </div>
-        )}
+            className="absolute left-0 top-0 w-full bg-indigo-600 rounded-full transition-all duration-300 ease-out"
+            style={{ height: `${progress}%` }}
+          />
+        </div>
       </div>
-    </div>
+
+      {/* Desktop progress bar */}
+      <div className="hidden md:block fixed left-8 top-24 bottom-24 w-8 z-10">
+        <div className="relative h-full w-2 bg-indigo-100 rounded-full">
+          <div
+            className="absolute left-0 top-0 w-full bg-indigo-600 rounded-full transition-all duration-300 ease-out"
+            style={{ height: `${progress}%` }}
+          />
+          {steps.map((s, i) => {
+            const isDayStart = firstIndexByDay.get(s.day) === i;
+            const size = isDayStart ? "w-4 h-4" : "w-3 h-3";
+            const top = (i / (steps.length - 1)) * 100;
+
+            // Tooltips without location
+            const label = isDayStart
+              ? `Day ${s.day} - ${s.title}`
+              : `${s.title}`;
+
+            return (
+              <div
+                key={i}
+                title={label}
+                onClick={() => scrollToStep(i)}
+                className={`absolute left-1/2 -translate-x-1/2 -translate-y-1/2 border-2 border-indigo-600 rounded-full shadow cursor-pointer ${size} ${
+                  i <= activeIndex ? "bg-indigo-600" : "bg-white"
+                }`}
+                style={{ top: `${top}%` }}
+              />
+            );
+          })}
+
+          {activeStep && (
+            <div
+              className="absolute left-full ml-4 -translate-y-1/2 bg-indigo-600 text-white shadow-lg px-3 py-1 rounded-full text-xs whitespace-nowrap"
+              style={{ top: `${progress}%` }}
+            >
+              {activeLabel}
+            </div>
+          )}
+        </div>
+      </div>
+    </>
   );
 };
 
