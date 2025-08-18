@@ -85,7 +85,7 @@ const Home: React.FC = () => {
   };
 
   return (
-    <div className="w-3/4 mx-auto py-20 px-4 relative flex flex-col items-center justify-center">
+    <div className="w-full md:w-3/4 mx-auto py-10 md:py-20 px-4 relative flex flex-col items-center justify-center">
       {step > 1 && step <= 4 && (
         <button
           onClick={handleBack}
@@ -96,8 +96,8 @@ const Home: React.FC = () => {
         </button>
       )}
 
-      <h1 className="text-5xl font-extrabold text-center mb-2">Trip Creator</h1>
-      <p className="text-4xl font-bold mb-8 text-center">Plan Your Perfect Trip</p>
+      <h1 className="text-3xl md:text-5xl font-extrabold text-center mb-2">Trip Creator</h1>
+      <p className="text-2xl md:text-4xl font-bold mb-8 text-center">Plan Your Perfect Trip</p>
 
       {/* Display chosen details */}
       <div className="flex flex-wrap gap-3 mb-8 justify-center">
@@ -189,7 +189,7 @@ const Home: React.FC = () => {
           {/* Sticky top-right button */}
           <button
             onClick={handleReset}
-            className="fixed top-20 right-20 z-50 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-xl shadow-md hover:bg-indigo-700 transition"
+            className="fixed top-4 right-4 md:top-20 md:right-20 z-50 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-xl shadow-md hover:bg-indigo-700 transition"
           >
             Start New Trip
           </button>

@@ -22,7 +22,7 @@ const TripStepCard: React.FC<TripStepCardProps> = ({
 }) => {
   return (
     <motion.div
-      className="bg-white rounded-2xl shadow-lg overflow-hidden w-72 sm:w-80"
+      className="bg-white rounded-2xl shadow-lg overflow-hidden w-full sm:w-80"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
