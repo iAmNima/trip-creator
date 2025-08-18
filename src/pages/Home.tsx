@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import AnimatedInput from "../components/AnimatedInput";
 import TagSelector from "../components/TagSelector";
 import TripStepCard from "../components/TripStepCard";
-import PathwayConnector from "../components/PathwayConnector";
+import StepConnector from "../components/StepConnector";
 import TripStepCardSkeleton from "../components/TripStepCardSkeleton";
 import ProgressTimeline from "../components/ProgressTimeline";
 import { ArrowLeft, Loader2 } from "lucide-react";
@@ -27,7 +27,6 @@ const Home: React.FC = () => {
   const [duration, setDuration] = useState("");
   const [interests, setInterests] = useState<string[]>([]);
   const [tripSteps, setTripSteps] = useState<TripStep[]>([]);
-  const [cardPositions, setCardPositions] = useState<("left" | "right")[]>([]);
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
 
@@ -38,7 +37,6 @@ const Home: React.FC = () => {
     setDuration("");
     setInterests([]);
     setTripSteps([]);
-    setCardPositions([]);
     setStep(1);
   };
 
@@ -73,9 +71,6 @@ const Home: React.FC = () => {
       );
 
       setTripSteps(stepsWithImages);
-      setCardPositions(
-        stepsWithImages.map(() => (Math.random() < 0.5 ? "left" : "right"))
-      );
       setStep(5);
     } catch (err) {
       console.error("Trip generation failed:", err);
@@ -172,10 +167,7 @@ const Home: React.FC = () => {
                     <TripStepCardSkeleton />
                   </div>
                   {i < 2 && (
-                    <PathwayConnector
-                      from={i % 2 === 0 ? "left" : "right"}
-                      to={i % 2 === 0 ? "right" : "left"}
-                    />
+                    <StepConnector direction={i % 2 === 0 ? "right" : "left"} />
                   )}
                 </React.Fragment>
               ))}
@@ -202,7 +194,7 @@ const Home: React.FC = () => {
                 <div
                   data-step-index={i}
                   className={`w-full flex ${
-                    cardPositions[i] === "left" ? "justify-start" : "justify-end"
+                    i % 2 === 0 ? "justify-start" : "justify-end"
                   }`}
                 >
                   <TripStepCard
@@ -215,10 +207,7 @@ const Home: React.FC = () => {
                   />
                 </div>
                 {i < tripSteps.length - 1 && (
-                  <PathwayConnector
-                    from={cardPositions[i]}
-                    to={cardPositions[i + 1]}
-                  />
+                  <StepConnector direction={i % 2 === 0 ? "right" : "left"} />
                 )}
               </React.Fragment>
             ))}
