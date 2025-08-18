@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import AnimatedInput from "../components/AnimatedInput";
 import TagSelector from "../components/TagSelector";
 import TripStepCard from "../components/TripStepCard";
-import StepConnector from "../components/StepConnector";
+import FootstepPath from "../components/FootstepPath";
 import TripStepCardSkeleton from "../components/TripStepCardSkeleton";
 import ProgressTimeline from "../components/ProgressTimeline";
 import { ArrowLeft, Loader2 } from "lucide-react";
@@ -158,18 +158,15 @@ const Home: React.FC = () => {
             {loading ? "Creating your trip..." : "Create My Trip ✈️"}
           </button>
           {loading && (
-            <div className="w-full max-w-3xl flex flex-col items-center mt-10 gap-10">
+            <div className="w-full max-w-3xl flex flex-col items-center mt-10 gap-10 relative">
+              <FootstepPath steps={3} />
               {[0, 1, 2].map((i) => (
-                <React.Fragment key={i}>
-                  <div
-                    className={`w-full flex ${i % 2 === 0 ? "justify-start" : "justify-end"}`}
-                  >
-                    <TripStepCardSkeleton />
-                  </div>
-                  {i < 2 && (
-                    <StepConnector direction={i % 2 === 0 ? "right" : "left"} />
-                  )}
-                </React.Fragment>
+                <div
+                  key={i}
+                  className={`w-full flex ${i % 2 === 0 ? "justify-start" : "justify-end"}`}
+                >
+                  <TripStepCardSkeleton />
+                </div>
               ))}
             </div>
           )}
@@ -188,28 +185,25 @@ const Home: React.FC = () => {
 
           <ProgressTimeline steps={tripSteps} />
 
-          <div className="w-full max-w-3xl flex flex-col items-center mt-10 gap-10">
+          <div className="w-full max-w-3xl flex flex-col items-center mt-10 gap-10 relative">
+            <FootstepPath steps={tripSteps.length} />
             {tripSteps.map((s, i) => (
-              <React.Fragment key={i}>
-                <div
-                  data-step-index={i}
-                  className={`w-full flex ${
-                    i % 2 === 0 ? "justify-start" : "justify-end"
-                  }`}
-                >
-                  <TripStepCard
-                    time={s.time}
-                    title={s.title}
-                    location={s.location}
-                    imageUrl={s.imageUrl || "https://source.unsplash.com/800x400/?travel"}
-                    mapsLink={s.mapsLink}
-                    websiteLink={s.websiteLink}
-                  />
-                </div>
-                {i < tripSteps.length - 1 && (
-                  <StepConnector direction={i % 2 === 0 ? "right" : "left"} />
-                )}
-              </React.Fragment>
+              <div
+                key={i}
+                data-step-index={i}
+                className={`w-full flex ${
+                  i % 2 === 0 ? "justify-start" : "justify-end"
+                }`}
+              >
+                <TripStepCard
+                  time={s.time}
+                  title={s.title}
+                  location={s.location}
+                  imageUrl={s.imageUrl || "https://source.unsplash.com/800x400/?travel"}
+                  mapsLink={s.mapsLink}
+                  websiteLink={s.websiteLink}
+                />
+              </div>
             ))}
           </div>
         </>
