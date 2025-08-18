@@ -178,10 +178,10 @@ const Home: React.FC = () => {
 
       {step === 5 && (
         <>
-          {/* Sticky top-right button */}
+          {/* Sticky action button repositioned for mobile */}
           <button
             onClick={handleReset}
-            className="fixed top-4 right-4 md:top-20 md:right-20 z-50 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-xl shadow-md hover:bg-indigo-700 transition"
+            className="fixed bottom-4 right-4 md:top-20 md:right-20 md:bottom-auto z-50 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-xl shadow-md hover:bg-indigo-700 transition"
           >
             Start New Trip
           </button>
