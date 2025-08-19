@@ -9,6 +9,8 @@ import ProgressTimeline from "../components/ProgressTimeline";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { generateTripPlan } from "../api/openai";
 import { fetchImageFromGoogle } from "../api/googleImage";
+import { geocodeLocation } from "../api/geocode";
+import MapView from "../components/MapView";
 
 // Type for individual itinerary step
 interface TripStep {
@@ -20,6 +22,7 @@ interface TripStep {
   imageUrl?: string;
   mapsLink?: string;
   websiteLink?: string;
+  coordinates?: { lat: number; lng: number };
 }
 
 const Home: React.FC = () => {
@@ -29,6 +32,7 @@ const Home: React.FC = () => {
   const [tripSteps, setTripSteps] = useState<TripStep[]>([]);
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [selectedStep, setSelectedStep] = useState<number | null>(null);
 
   const handleNext = () => setStep((prev) => prev + 1);
   const handleBack = () => setStep((prev) => Math.max(1, prev - 1));
@@ -38,6 +42,7 @@ const Home: React.FC = () => {
     setInterests([]);
     setTripSteps([]);
     setStep(1);
+    setSelectedStep(null);
   };
 
   const handleCreateTrip = async () => {
@@ -46,10 +51,11 @@ const Home: React.FC = () => {
       const raw = await generateTripPlan(destination, duration, interests);
       const parsed: TripStep[] = JSON.parse(raw);
 
-      // Track which image we already fetched per location
+      // Track which image and coordinates we already fetched per location
       const locationImageCache = new Map<string, string>();
+      const locationGeoCache = new Map<string, { lat: number; lng: number }>();
 
-      const stepsWithImages = await Promise.all(
+      const stepsWithData = await Promise.all(
         parsed.map(async (step) => {
           const key = step.location.trim().toLowerCase(); // normalize
 
@@ -61,21 +67,39 @@ const Home: React.FC = () => {
             }
           }
 
+          let coordinates = locationGeoCache.get(key);
+          if (!coordinates) {
+            const geo = await geocodeLocation(step.location);
+            if (geo) {
+              locationGeoCache.set(key, geo);
+              coordinates = geo;
+            }
+          }
+
           const imageUrl = locationImageCache.get(key);
 
           return {
             ...step,
             imageUrl: imageUrl ?? undefined,
+            coordinates,
           };
         })
       );
 
-      setTripSteps(stepsWithImages);
+      setTripSteps(stepsWithData);
       setStep(5);
     } catch (err) {
       console.error("Trip generation failed:", err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleMarkerClick = (index: number) => {
+    setSelectedStep(index);
+    const el = document.querySelector(`[data-step-index='${index}']`);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
     }
   };
 
@@ -186,6 +210,8 @@ const Home: React.FC = () => {
             Start New Trip
           </button>
 
+          <MapView steps={tripSteps} onMarkerClick={handleMarkerClick} />
+
           <ProgressTimeline steps={tripSteps} />
 
           <div className="w-full max-w-3xl flex flex-col items-center mt-10 gap-10">
@@ -193,9 +219,9 @@ const Home: React.FC = () => {
               <React.Fragment key={i}>
                 <div
                   data-step-index={i}
-                  className={`w-full flex ${
+                  className={`p-1 rounded-2xl w-full flex ${
                     i % 2 === 0 ? "justify-start" : "justify-end"
-                  }`}
+                  } ${selectedStep === i ? "ring-4 ring-indigo-500" : ""}`}
                 >
                   <TripStepCard
                     time={s.time}
