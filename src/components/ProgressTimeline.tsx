@@ -87,16 +87,6 @@ const ProgressTimeline: React.FC<ProgressTimelineProps> = ({ steps }) => {
 
   return (
     <>
-      {/* Mobile progress bar */}
-      <div className="md:hidden fixed left-4 top-24 bottom-24 w-2 z-10">
-        <div className="relative h-full w-full bg-indigo-100 rounded-full">
-          <div
-            className="absolute left-0 top-0 w-full bg-indigo-600 rounded-full transition-all duration-300 ease-out"
-            style={{ height: `${progress}%` }}
-          />
-        </div>
-      </div>
-
       {/* Desktop progress bar */}
       <div className="hidden md:block fixed left-8 top-24 bottom-24 w-8 z-10">
         <div className="relative h-full w-2 bg-indigo-100 rounded-full">
